@@ -1,0 +1,1 @@
+A smart and interactive web application that detects and filters spam emails using a powerful AI-based classifier. It also features an intelligent chatbot powered by the DeepSeek model, allowing seamless communication and user support within the same interface. Built with HTML, CSS, JavaScript
