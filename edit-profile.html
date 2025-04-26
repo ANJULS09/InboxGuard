@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - InboxGuard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
+            if (!isLoggedIn) {
+                window.location.href = "index.html"
+                return
+            }
+            
+            // Get profile data from localStorage
+            const profileData = JSON.parse(localStorage.getItem("profileData") || "{}")
+            
+            // Populate form fields with existing data
+            const nameInput = document.getElementById("name")
+            const emailInput = document.getElementById("email")
+            const locationInput = document.getElementById("location")
+            const bioInput = document.getElementById("bio")
+            const notificationsInput = document.getElementById("notifications")
+            
+            if (nameInput && profileData.name) {
+                nameInput.value = profileData.name
+            }
+            
+            if (emailInput && profileData.email) {
+                emailInput.value = profileData.email
+            }
+            
+            if (locationInput && profileData.location) {
+                locationInput.value = profileData.location
+            }
+            
+            if (bioInput && profileData.bio) {
+                bioInput.value = profileData.bio
+            }
+            
+            if (notificationsInput && profileData.notifications !== undefined) {
+                notificationsInput.checked = profileData.notifications
+            }
+            
+            // Handle form submission
+            const editProfileForm = document.getElementById("edit-profile-form")
+            if (editProfileForm) {
+                editProfileForm.addEventListener("submit", (e) => {
+                    e.preventDefault()
+                    
+                    // Get updated values
+                    const updatedProfileData = {
+                        name: nameInput.value,
+                        email: emailInput.value,
+                        location: locationInput.value,
+                        bio: bioInput.value,
+                        notifications: notificationsInput.checked
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem("profileData", JSON.stringify(updatedProfileData))
+                    
+                    // Show success message
+                    alert("Profile updated successfully!")
+                    
+                    // Redirect back to profile page
+                    window.location.href = "index.html#profile-section"
+                })
+            }
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById("theme-toggle")
+            if (themeToggle) {
+                themeToggle.addEventListener("click", () => {
+                    document.body.classList.toggle("dark")
+                    
+                    if (document.body.classList.contains("dark")) {
+                        themeToggle.innerHTML = '<i class="fas fa-sun"></i>'
+                    } else {
+                        themeToggle.innerHTML = '<i class="fas fa-moon"></i>'
+                    }
+                    
+                    // Save theme preference
+                    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light")
+                })
+            }
+            
+            // Check for saved theme preference
+            if (
+                localStorage.getItem("theme") === "dark" ||
+                (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+                document.body.classList.add("dark")
+                if (themeToggle) {
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>'
+                }
+            }
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById("logout-btn")
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    localStorage.removeItem("isLoggedIn")
+                    window.location.href = "index.html"
+                })
+            }
+        })
+    </script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>InboxGuard</span>
+            </div>
+            <div class="navbar-menu">
+                <a href="index.html" class="navbar-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="index.html#profile-section" class="navbar-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="index.html#contact-section" class="navbar-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="logout-btn" class="navbar-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 pt-24 pb-12">
+        <a href="index.html#profile-section" class="btn btn-ghost mb-6">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Profile
+        </a>
+        
+        <div class="card max-w-2xl mx-auto">
+            <div class="card-header">
+                <h2 class="card-title text-2xl">Edit Profile</h2>
+                <p class="card-description">
+                    Update your personal information and preferences
+                </p>
+            </div>
+            <div class="card-content">
+                <form id="edit-profile-form" class="space-y-6">
+                    <div class="flex justify-center mb-6">
+                        <div class="relative">
+                            <div class="avatar-placeholder edit-avatar">
+                                <i class="fas fa-user"></i>
+                                <div class="avatar-upload">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" placeholder="Tell us about yourself" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label for="notifications">Email Notifications</label>
+                            <label class="switch">
+                                <input type="checkbox" id="notifications" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="index.html#profile-section" class="btn btn-outline">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-2"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

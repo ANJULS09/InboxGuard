@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSpam Detector - Email Spam Classifier</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+
+        <div class="container">
+            <div class="navbar-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>InboxGuard</span>
+            </div>
+            <div class="navbar-menu">
+                <a href="#" class="navbar-item" id="home-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#profile-section" class="navbar-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="#contact-section" class="navbar-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <section id="login-section" class="section">
+        <div class="container">
+            <div class="auth-tabs">
+                <button id="login-tab" class="auth-tab active">Login</button>
+                <button id="signup-tab" class="auth-tab">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="login-form-container" class="card login-card">
+                <div class="card-header text-center">
+                    <div class="icon-container">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h2 class="card-title">Secure Login</h2>
+                    <p class="card-description">Enter your credentials to access the Email Spam Classifier</p>
+                </div>
+                <div class="card-content">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="login-remember">
+                            <label for="login-remember">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </form>
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signup-form-container" class="card login-card hidden">
+                <div class="card-header text-center">
+                    <div class="icon-container">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2 class="card-title">Create Account</h2>
+                    <p class="card-description">Sign up to use our Email Spam Classifier</p>
+                </div>
+                <div class="card-content">
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label for="signup-name">Full Name</label>
+                            <input type="text" id="signup-name" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email</label>
+                            <input type="email" id="signup-email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required>
+                            <div class="password-strength">
+                                <div class="strength-meter" id="password-strength-meter"></div>
+                                <span id="password-strength-text">Password strength</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm-password">Confirm Password</label>
+                            <input type="password" id="signup-confirm-password" required>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="signup-terms" required>
+                            <label for="signup-terms">I agree to the <a href="#">Terms and Conditions</a></label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                    </form>
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Application (Hidden until login) -->
+    <div id="app-container" class="hidden">
+        <!-- Spam Classifier Section -->
+        <section class="section app-section">
+            <div class="container">
+                <header class="text-center mb-8">
+                    <h1>Email/SMS Spam Classifier</h1>
+                    <p class="subtitle">Check if your email/SMS is likely to be classified as spam</p>
+                </header>
+
+                <div class="card mb-8">
+                    <div class="card-content">
+                        <form id="spam-form">
+                            <div class="form-group">
+                                <label for="email-content"></label>
+                                <textarea id="email-content" placeholder="Paste your email/SMS content here..." rows="6" required></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" id="analyze-btn" class="btn btn-primary">Analyze Content</button>
+                                <button type="button" id="clear-btn" class="btn btn-outline">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="result" class="card result-card hidden">
+                    <div class="card-content">
+                        <div class="text-center mb-4">
+                            <h2 id="result-title" class="result-title"></h2>
+                            <div id="category-container" class="category-container hidden">
+                                <div id="category-badge" class="category-badge">
+                                    <i id="category-icon" class="fas fa-exclamation-triangle"></i>
+                                    <span id="spam-category">Unknown</span>
+                                </div>
+                            </div>
+                            <div class="progress-container">
+                                <div id="progress-bar" class="progress-bar"></div>
+                            </div>
+                            <p id="confidence" class="confidence"></p>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="feature-heading">Detected Features</h3>
+                            <ul id="feature-list" class="feature-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">About This Classifier</h2>
+                    </div>
+                    <div class="card-content">
+                        <p class="mb-4">
+                            This tool uses machine learning algorithms to detect and categorize different types of spam emails. 
+                            It analyzes the text for suspicious patterns commonly found in unwanted messages.
+                        </p>
+                        <h3 class="mb-2">Spam Categories</h3>
+                        <div class="categories-grid">
+                            <div class="category-card phishing">
+                                <div class="category-icon"><i class="fas fa-fish"></i></div>
+                                <h4>Phishing</h4>
+                                <p>Attempts to steal sensitive information by impersonating legitimate organizations.</p>
+                            </div>
+                            <div class="category-card promotion">
+                                <div class="category-icon"><i class="fas fa-tag"></i></div>
+                                <h4>Promotion</h4>
+                                <p>Unsolicited marketing emails trying to sell products or services.</p>
+                            </div>
+                            <div class="category-card scam">
+                                <div class="category-icon"><i class="fas fa-skull-crossbones"></i></div>
+                                <h4>Scam</h4>
+                                <p>Fraudulent schemes designed to trick you into sending money or personal information.</p>
+                            </div>
+                            <div class="category-card malware">
+                                <div class="category-icon"><i class="fas fa-bug"></i></div>
+                                <h4>Malware</h4>
+                                <p>Emails containing harmful attachments or links to malicious software.</p>
+                            </div>
+                            <div class="category-card social-engineering">
+                                <div class="category-icon"><i class="fas fa-user-secret"></i></div>
+                                <h4>Social Engineering</h4>
+                                <p>Psychological manipulation to trick people into making security mistakes.</p>
+                            </div>
+                        </div>
+                        <h3 class="mb-2 mt-4">How it works</h3>
+                        <p>
+                            The classifier scans your email text for known spam indicators specific to each category.
+                            Each indicator is assigned a weight based on how strongly it suggests spam, and the
+                            overall spam score is calculated by combining these weights.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+
+        <section id="profile-section" class="section profile-section">
+            <div class="container">
+                <h2 class="text-center mb-8">Your Profile</h2>
+                
+                <div class="profile-container">
+                    <div class="card profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                    <div class="avatar-upload">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <h2 id="profile-name">John Doe</h2>
+                                <p id="profile-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb81848385c58f848eab8e938a869b878ec5888486">[email&#160;protected]</a></p>
+                                <div class="profile-badges">
+                                    <span class="profile-badge"><i class="fas fa-shield-alt"></i> Verified</span>
+                                    <span class="profile-badge"><i class="fas fa-star"></i> Premium</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">24</span>
+                                    <span class="stat-label">Scans</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">18</span>
+                                    <span class="stat-label">Spam Detected</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">6</span>
+                                    <span class="stat-label">Safe Emails</span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-details">
+                                <h3 class="mb-4">Account Details</h3>
+                                <div class="detail-item">
+                                    <div class="detail-label"><i class="fas fa-calendar"></i> Joined</div>
+                                    <div class="detail-value">March 15, 2023</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label"><i class="fas fa-clock"></i> Last Login</div>
+                                    <div class="detail-value">Today at 10:45 AM</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label"><i class="fas fa-globe"></i> Location</div>
+                                    <div class="detail-value">New York, USA</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label"><i class="fas fa-bell"></i> Notifications</div>
+                                    <div class="detail-value">
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-actions">
+                                <a href="edit-profile.html" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </a>
+                                <a href="edit-password.html" class="btn btn-outline">
+                                    <i class="fas fa-key"></i> Change Password
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card security-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Security Status</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="security-score">
+                                <div class="score-circle">
+                                    <svg viewBox="0 0 36 36" class="circular-chart">
+                                        <path class="circle-bg" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle" stroke-dasharray="85, 100" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <text x="18" y="20.35" class="percentage">85%</text>
+                                    </svg>
+                                </div>
+                                <div class="score-info">
+                                    <h3>Security Score</h3>
+                                    <p>Your account security is good, but could be improved.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="security-recommendations">
+                                <h4>Recommendations</h4>
+                                <ul class="recommendation-list">
+                                    <li class="completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Use a strong password</span>
+                                    </li>
+                                    <li class="completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Verify your email</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Enable two-factor authentication</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact-section" class="section contact-section">
+            <div class="container">
+                <h2 class="text-center mb-8">Contact Us</h2>
+                
+                <div id="contact-form-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Send us a message</h2>
+                            <p class="card-description">
+                                Have questions about our spam detection? Get in touch with our cybersecurity team.
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <form id="contact-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="contact-name">Name</label>
+                                        <input type="text" id="contact-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="contact-email">Email</label>
+                                        <input type="email" id="contact-email" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-message">Message</label>
+                                    <textarea id="contact-message" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-envelope"></i>
+                                    Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="contact-success" class="card hidden">
+                    <div class="card-content text-center">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="mb-2">Message Sent!</h3>
+                        <p>Thank you for contacting us. We'll get back to you soon.</p>
+                    </div>
+                </div>
+                
+                <div class="footer-text">
+                    <p>© <span id="current-year"></span> CyberSpam Detector. All rights reserved.</p>
+                </div>
+            </div>
+        </section>
+        
+    
+<!-- Chatbot Components -->
+<iframe id="chatbot-frame" src="chatbot.html" class="chatbot-iframe"></iframe>
+<button onclick="toggleChatbot()" class="chatbot-button">
+    <i class="fas fa-comments"></i> Chat with AI
+</button>
+
+<!-- Chatbot Styles -->
+<style>
+    .chatbot-iframe {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 350px;
+        height: 450px;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        display: none; /* Initially hidden */
+        background: white;
+        z-index: 1000;
+    }
+    
+    .chatbot-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+    
+    .chatbot-button:hover {
+        background-color: #218838;
+    }
+
+    /* Profile Section Styles */
+    .profile-section {
+        background-color: var(--muted);
+        min-height: auto;
+        padding: 4rem 0;
+    }
+
+    .profile-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .profile-card {
+        overflow: visible;
+    }
+
+    .profile-header {
+        display: flex;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), #2563eb);
+        color: white;
+        border-radius: var(--radius) var(--radius) 0 0;
+        position: relative;
+    }
+
+    .profile-avatar {
+        margin-right: 1.5rem;
+    }
+
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        position: relative;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .avatar-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: var(--primary);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: 2px solid white;
+        transition: all 0.2s;
+    }
+
+    .avatar-upload:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-info h2 {
+        margin: 0 0 0.25rem;
+        font-size: 1.75rem;
+    }
+
+    .profile-info p {
+        margin: 0 0 0.75rem;
+        opacity: 0.9;
+    }
+
+    .profile-badges {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .profile-badge {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .profile-badge i {
+        margin-right: 0.25rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+    }
+
+    .profile-details {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .detail-label {
+        display: flex;
+        align-items: center;
+        color: var(--muted-foreground);
+    }
+
+    .detail-label i {
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+
+    .detail-value {
+        font-weight: 500;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    /* Toggle Switch */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--muted);
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    /* Security Card */
+    .security-card {
+        height: fit-content;
+    }
+
+    .security-score {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .score-circle {
+        width: 100px;
+        margin-right: 1rem;
+    }
+
+    .circular-chart {
+        display: block;
+        max-width: 100%;
+        max-height: 250px;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 3.8;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 3.8;
+        stroke-linecap: round;
+        stroke: var(--primary);
+        animation: progress 1s ease-out forwards;
+    }
+
+    @keyframes progress {
+        0% {
+            stroke-dasharray: 0 100;
+        }
+    }
+
+    .percentage {
+        fill: var(--foreground);
+        font-size: 0.5em;
+        text-anchor: middle;
+        font-weight: bold;
+    }
+
+    .score-info h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.25rem;
+    }
+
+    .score-info p {
+        margin: 0;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+    }
+
+    .security-recommendations {
+        margin-top: 1.5rem;
+    }
+
+    .security-recommendations h4 {
+        margin-bottom: 0.75rem;
+    }
+
+    .recommendation-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .recommendation-list li {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+
+    .recommendation-list li i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .recommendation-list .completed i {
+        color: var(--success);
+    }
+
+    .recommendation-list li:not(.completed) i {
+        color: var(--warning);
+    }
+</style>
+
+<!-- JavaScript to Toggle Chatbot -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    function toggleChatbot() {
+        const chatbotFrame = document.getElementById("chatbot-frame");
+        chatbotFrame.style.display = chatbotFrame.style.display === "none" ? "block" : "none";
+    }
+</script>
+</div>
+    <script src="script.js"></script>
+</body>
+</html>
